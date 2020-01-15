@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import unittest
+from pom_google_homepage import googlepage
 
 
 # erstellen der klasse die von unittest.testcase erbt
@@ -10,26 +11,22 @@ class GoogleTest(unittest.TestCase):
     def setUp(self):
         # setup vom chrome browser vor jedem test
         self.driver = webdriver.Chrome()
+       
 
     def test_google_search(self):
         # automatisieren der googlesuche
-        self.driver.get('https://www.google.com/xhtml')
-        search_field = self.driver.find_element_by_name('q')
-        search_field.send_keys('cheesecake')
-        search_field.submit()
-
+        keyword = 'cheesecake'
+        search = googlepage(self.driver)
+        search.submit_search(keyword)
         time.sleep(5)
 
         # suchergebnisse der ersten seite
-        links = self.driver.find_elements_by_class_name('r')
-        
-        # speichern der ergebnisse in results
-        results = []
-        for link in links: 
-            results.append(link.text)
+        search.get_all_links()
 
+        assert len(search.results) > 0, "No results found"
+        
         # test der ersten 3 ergebnisse auf cheesecake
-        for result in results[:3]:
+        for result in search.results[:3]:
             assert "cheesecake" in result.lower()
     
 
